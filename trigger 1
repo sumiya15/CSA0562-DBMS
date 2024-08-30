@@ -1,0 +1,15 @@
+CREATE OR REPLACE TRIGGER prevent_salary_update
+BEFORE UPDATE OF salary ON employees
+FOR EACH ROW
+DECLARE
+    v_current_hour NUMBER;
+BEGIN
+    -- Get the current hour of the day
+    v_current_hour := TO_NUMBER(TO_CHAR(SYSDATE, 'HH24'));
+    
+    -- Check if the current hour is between 22 (10 PM) and 6 (6 AM)
+    IF v_current_hour >= 22 OR v_current_hour < 6 THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Updates to the salary column are not allowed between 10 PM and 6 AM.');
+    END IF;
+END;
+/
